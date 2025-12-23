@@ -97,9 +97,60 @@ For each repository and date, the scraper collects:
 3. Appends the data to the historical record
 4. If data for that date already exists, it updates it
 
-## Scheduling (Optional)
+## Automated Execution with GitHub Actions
 
-To run this daily automatically, you can:
+This repository includes a GitHub Actions workflow that runs the scraper automatically every day.
+
+### Setup
+
+1. **Create a Personal Access Token (PAT)**
+   - Follow the instructions in the "Setup" section above to create a PAT
+   - Make sure it has `repo` scope for private repos
+
+2. **Add GitHub Secrets**
+   - Go to your repository on GitHub
+   - Navigate to Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Add the following secrets:
+     - **Name**: `PAT` (Note: Cannot start with "GITHUB_")
+     - **Value**: Your Personal Access Token
+     - **Name**: `USERNAME` (optional, defaults to "Sesquii")
+     - **Value**: Your GitHub username
+
+3. **Enable Workflow**
+   - The workflow file is already created at `.github/workflows/scrape_repo_data.yml`
+   - It runs daily at 00:00 UTC
+   - You can also trigger it manually from the Actions tab
+
+4. **Workflow Behavior**
+   - Runs the scraper automatically
+   - Collects data from 7 days ago
+   - Commits the updated data files back to the repository
+   - Creates a commit with message: "Update repository data: YYYY-MM-DD"
+
+### Manual Trigger
+
+You can manually trigger the workflow:
+1. Go to the "Actions" tab in your repository
+2. Select "Scrape Repository Data" workflow
+3. Click "Run workflow"
+
+### Schedule Customization
+
+To change when the workflow runs, edit `.github/workflows/scrape_repo_data.yml`:
+```yaml
+schedule:
+  - cron: '0 0 * * *'  # Daily at midnight UTC
+```
+
+Cron format: `minute hour day month day-of-week`
+- `0 0 * * *` = Daily at midnight UTC
+- `0 12 * * *` = Daily at noon UTC
+- `0 0 * * 1` = Every Monday at midnight UTC
+
+## Local Scheduling (Alternative)
+
+To run this locally on a schedule, you can:
 
 ### Windows Task Scheduler
 1. Open Task Scheduler
